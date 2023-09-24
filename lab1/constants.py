@@ -7,7 +7,7 @@ SCREEN_HEIGHT = 600
 BACKGROUND_COLOR = (32, 32, 48)
 COUNT_FIGURES = 10
 TARGET_FPS = 60
-LIMIT_TRAIL = 20
+LIMIT_TRAIL = 24
 
 
 # Типы фигуры
@@ -17,11 +17,20 @@ class Shape(Enum):
     Rectangle = 1
     Circle = 2
     Triangle = 3
-
     @classmethod
     def list(cls):
         return list(map(lambda c: c.name, cls))
 
+# Направление
+@unique
+class Direction(Enum):
+    Up = 0
+    Left = 1
+    Down = 2
+    Right = 3
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.name, cls))
 
 # Цвета
 @unique
@@ -48,7 +57,6 @@ class Color(Enum):
     PURPURE = (255, 0, 128)
     INDIGO = (128, 0, 255)
     LILAC = (255, 128, 255)
-
     @classmethod
     def list(cls):
         return list(map(lambda c: c.name, cls))

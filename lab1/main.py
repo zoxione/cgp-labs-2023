@@ -4,7 +4,7 @@ import pygame
 import sys
 from Figure import Figure
 from State import State
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, Color, BACKGROUND_COLOR, Shape, COUNT_FIGURES, TARGET_FPS
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, Color, BACKGROUND_COLOR, Shape, COUNT_FIGURES, TARGET_FPS, Direction
 
 
 # Функция для очистки экрана
@@ -110,35 +110,15 @@ def handle_keys():
     keys = pygame.key.get_pressed()
     state = State()
 
-    if keys[pygame.K_LEFT]:
-        # Движение влево
-        if state.user_figure.dx == 0:
-            state.user_figure.dx = abs(state.user_figure.dy) * -1
-        else:
-            state.user_figure.dx = abs(state.user_figure.dx) * -1
-        state.user_figure.dy = 0
-    elif keys[pygame.K_RIGHT]:
-        # Движение вправо
-        if state.user_figure.dx == 0:
-            state.user_figure.dx = abs(state.user_figure.dy)
-        else:
-            state.user_figure.dx = abs(state.user_figure.dx)
-        state.user_figure.dy = 0
-
     if keys[pygame.K_UP]:
-        # Движение вверх
-        if state.user_figure.dy == 0:
-            state.user_figure.dy = abs(state.user_figure.dx) * -1
-        else:
-            state.user_figure.dy = abs(state.user_figure.dy) * -1
-        state.user_figure.dx = 0
+        state.user_figure.move(Direction.Up)
     elif keys[pygame.K_DOWN]:
-        # Движение вниз
-        if state.user_figure.dy == 0:
-            state.user_figure.dy = abs(state.user_figure.dx)
-        else:
-            state.user_figure.dy = abs(state.user_figure.dy)
-        state.user_figure.dx = 0
+        state.user_figure.move(Direction.Down)
+
+    if keys[pygame.K_LEFT]:
+        state.user_figure.move(Direction.Left)
+    elif keys[pygame.K_RIGHT]:
+        state.user_figure.move(Direction.Right)
 
 
 # Главная функция для выполнения основной логики
@@ -220,7 +200,6 @@ if __name__ == "__main__":
         # Отображение ФПС
         display_fps(clock, fps_font, fps_surface)
         screen.blit(fps_surface, (10, 10))
-
 
         for figure in state.figures:
             figure.color_fill = random.choice(list(Color))

@@ -111,14 +111,13 @@ def handle_keys():
     state = State()
 
     if keys[pygame.K_UP]:
-        state.user_figure.move(Direction.Up)
+        state.user_figure.change_direction(Direction.Up)
     elif keys[pygame.K_DOWN]:
-        state.user_figure.move(Direction.Down)
-
+        state.user_figure.change_direction(Direction.Down)
     if keys[pygame.K_LEFT]:
-        state.user_figure.move(Direction.Left)
+        state.user_figure.change_direction(Direction.Left)
     elif keys[pygame.K_RIGHT]:
-        state.user_figure.move(Direction.Right)
+        state.user_figure.change_direction(Direction.Right)
 
 
 # Главная функция для выполнения основной логики

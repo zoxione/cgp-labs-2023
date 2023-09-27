@@ -1,5 +1,5 @@
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, Shape, Color, LIMIT_TRAIL, Direction
-import math
+
 
 class Figure:
     def __init__(self, shape: Shape, x: int, y: int, width, height, dx: int, dy: int, color_fill: Color, color_outline: Color):

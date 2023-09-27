@@ -8,6 +8,7 @@ BACKGROUND_COLOR = (32, 32, 48)
 COUNT_FIGURES = 10
 TARGET_FPS = 60
 LIMIT_TRAIL = 24
+RADIUS_MOVE_CIRCULAR = 200
 
 
 # Типы фигуры
@@ -28,6 +29,16 @@ class Direction(Enum):
     Left = 1
     Down = 2
     Right = 3
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.name, cls))
+
+# Режим движения
+@unique
+class MovementMode(Enum):
+    Linear = 0
+    Circular = 1
+    Gravity = 2
     @classmethod
     def list(cls):
         return list(map(lambda c: c.name, cls))

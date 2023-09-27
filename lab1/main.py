@@ -4,11 +4,13 @@ import pygame
 import sys
 from Figure import Figure
 from State import State
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, Color, BACKGROUND_COLOR, Shape, COUNT_FIGURES, TARGET_FPS, Direction
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, Color, BACKGROUND_COLOR, Shape, COUNT_FIGURES, TARGET_FPS, Direction, MovementMode
 
 
-# Функция для очистки экрана
 def clear_screen(current_x, current_y, future_x, future_y, width, height, shape: Shape):
+    """
+    Функция для очистки экрана (Общая)
+    """
     state = State()
 
     draw_figure(
@@ -31,22 +33,28 @@ def clear_screen(current_x, current_y, future_x, future_y, width, height, shape:
     )
 
 
-# Функция для отображения инфы о фигуре
 def display_info(font, x, y, dx, dy):
+    """
+    Функция для отображения инфы о фигуре (Общая)
+    """
     state = State()
     velocity_text = font.render(f"Velocity: ({dx}, {dy})", True, Color.WHITE.value)
     state.screen.blit(velocity_text, (x - 20, y - 40))
 
 
-# Функция для отображения фпс
 def display_fps(clock, font, surface):
+    """
+    Функция для отображения фпс (Общая)
+    """
     fps_text = font.render(f"FPS: {int(clock.get_fps())}", True, Color.WHITE.value)
     surface.fill(BACKGROUND_COLOR)
     surface.blit(fps_text, (10, 10))
 
 
-# Функция для рисования фигуры
 def draw_figure(surface, shape: Shape, x, y, width, height, color_fill, color_outline = None):
+    """
+    Функция для рисования фигуры (Общая)
+    """
     outline_size = 3
     vertices = []
 
@@ -88,8 +96,10 @@ def draw_figure(surface, shape: Shape, x, y, width, height, color_fill, color_ou
         pygame.draw.polygon(surface, color_outline, vertices, outline_size)
 
 
-# Функция для рисования следа от фигуры
 def draw_trail(trail, shape: Shape, width, height, color_fill):
+    """
+    Функция для рисования следа от фигуры (Отхонов)
+    """
     state = State()
 
     # Создаем поверхность для хвоста с прозрачностью
@@ -105,8 +115,10 @@ def draw_trail(trail, shape: Shape, width, height, color_fill):
     state.screen.blit(trail_surface, (0, 0))
 
 
-# Функция для обработки событий клавиш
 def handle_keys():
+    """
+    Функция для обработки событий клавиш (Отховнов + Бакухин)
+    """
     keys = pygame.key.get_pressed()
     state = State()
 
@@ -119,8 +131,53 @@ def handle_keys():
     elif keys[pygame.K_RIGHT]:
         state.user_figure.change_direction(Direction.Right)
 
+    if keys[pygame.K_1]:
+        state.movement_mode = MovementMode.Linear
+    elif keys[pygame.K_2]:
+        state.movement_mode = MovementMode.Circular
+    elif keys[pygame.K_3]:
+        state.movement_mode = MovementMode.Gravity
 
-# Главная функция для выполнения основной логики
+
+def check_collision(figure1, figure2):
+    """
+    Функция проверки на коллизию двух фигур (Бакухин)
+    """
+    if (figure1.x + figure1.width > figure2.x and
+            figure1.x < figure2.x + figure2.width and
+            figure1.y + figure1.height > figure2.y and
+            figure1.y < figure2.y + figure2.height):
+        return True
+    return False
+
+
+def handle_collision(figure1, figure2):
+    """
+    Функция для обработки коллизии двух фигур (Бакухин)
+    """
+    # Рассчитываем расстояние между центрами фигур
+    distance = math.sqrt((figure1.x - figure2.x) ** 2 + (figure1.y - figure2.y) ** 2)
+
+    # Рассчитываем перекрытие
+    overlap = (figure1.width + figure2.width) / 2 - distance
+
+    # Если есть перекрытие, то отодвигаем фигуры
+    if overlap > 0:
+        angle = math.atan2(figure2.y - figure1.y, figure2.x - figure1.x)
+        dx = overlap * math.cos(angle)
+        dy = overlap * math.sin(angle)
+        figure1.x -= dx
+        figure1.y -= dy
+        figure2.x += dx
+        figure2.y += dy
+
+        # Меняем направление движения
+        figure1.dx = -figure1.dx
+        figure1.dy = -figure1.dy
+        figure2.dx = -figure2.dx
+        figure2.dy = -figure2.dy
+
+
 if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -149,7 +206,7 @@ if __name__ == "__main__":
     user_position = [random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT)]
     user_size = [random.randint(16, 42), random.randint(16, 42)]
     user_velocity = [random.randint(-5, 5), random.randint(-5, 5)]
-    state.user_figure = Figure(Shape.Square, user_position[0], user_position[1], user_size[0], user_size[1], user_velocity[0], user_velocity[1], Color.RED, Color.YELLOW)
+    state.user_figure = Figure(Shape.Circle, user_position[0], user_position[1], user_size[0], user_size[1], user_velocity[0], user_velocity[1], Color.RED, Color.YELLOW)
 
     # Основной цикл
     while True:
@@ -161,7 +218,7 @@ if __name__ == "__main__":
         user_current_x = state.user_figure.x
         user_current_y = state.user_figure.y
 
-        state.user_figure.move()
+        state.user_figure.move(MovementMode.Linear)
         clear_screen(
             user_current_x,
             user_current_y,
@@ -193,19 +250,26 @@ if __name__ == "__main__":
         )
         display_info(info_font, state.user_figure.x, state.user_figure.y, state.user_figure.dx, state.user_figure.dy)
 
-        # Обработка нажатий на стрелки
+        # Обработка нажатий на клавиши
         handle_keys()
 
         # Отображение ФПС
         display_fps(clock, fps_font, fps_surface)
         screen.blit(fps_surface, (10, 10))
 
+        # Цикл работы с фигурами
         for figure in state.figures:
+            # Проверка на коллизию каждой фигуры с каждой
+            for other_figure in state.figures:
+                if figure != other_figure:
+                    if check_collision(figure, other_figure):
+                        handle_collision(figure, other_figure)
+
             figure.color_fill = random.choice(list(Color))
             current_x = figure.x
             current_y = figure.y
 
-            figure.move()
+            figure.move(state.movement_mode)
             clear_screen(
                 current_x,
                 current_y,

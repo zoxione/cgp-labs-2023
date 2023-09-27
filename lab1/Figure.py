@@ -1,4 +1,6 @@
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, Shape, Color, LIMIT_TRAIL, Direction
+import math
+import random
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, Shape, Color, LIMIT_TRAIL, Direction, MovementMode, RADIUS_MOVE_CIRCULAR
 
 
 class Figure:
@@ -15,13 +17,12 @@ class Figure:
         self.color_fill = color_fill
         self.color_outline = color_outline
         self.trail = []
+        self.angle = random.uniform(0, 2 * math.pi)
 
-    def move(self):
-        # Движение по направлению
-        self.x += self.dx
-        self.y += self.dy
-
-        # Проверка на отражение от краев экрана
+    def check_screen_boundary(self):
+        """
+        Метод проверки на отражение от краев экрана (Отхонов + Бакухин)
+        """
         if self.x - self.width / 2 <= 0 or self.x + self.width / 2 >= SCREEN_WIDTH:
             self.dx = -self.dx
             self.x = max(self.width / 2, min(SCREEN_WIDTH - self.width / 2, self.x))
@@ -29,8 +30,36 @@ class Figure:
             self.dy = -self.dy
             self.y = max(self.height / 2, min(SCREEN_HEIGHT - self.height / 2, self.y))
 
+    def move(self, movement_mode: MovementMode):
+        """
+        Метод для движения (Общий)
+        """
+        if movement_mode.value == MovementMode.Linear.value:
+            self.move_linear()
+        elif movement_mode.value == MovementMode.Circular.value:
+            self.move_circular(RADIUS_MOVE_CIRCULAR)
+
+    def move_linear(self):
+        """
+        Метод для движения по направлению (Отхонов)
+        """
+        self.x += self.dx
+        self.y += self.dy
+        self.check_screen_boundary()
+
+    def move_circular(self, radius: float):
+        """
+        Метод для движения по концентрической траектории (Бакухин)
+        """
+        self.x = SCREEN_WIDTH / 2 + radius * math.cos(self.angle)
+        self.y = SCREEN_HEIGHT / 2 + radius * math.sin(self.angle)
+        self.angle += 0.02
+        self.angle %= 2 * math.pi # угол остается в диапазоне [0, 2*pi)
+
     def change_direction(self, direction: Direction):
-        # Выбор направления
+        """
+        Метод для изменения направления движения (Отхонов)
+        """
         if direction.value == Direction.Up.value:
             # Движение вверх
             self.dy = abs(self.dx) * -1 if self.s_dy == 0 else abs(self.s_dy) * -1
@@ -52,10 +81,10 @@ class Figure:
             self.dx = 3 if self.dx == 0 else self.dx
             self.dy = 0
 
-        self.move()
-
     def update_trail(self):
+        """
+        Метод для обновления хвоста фигуры (Отхонов)
+        """
         self.trail.append([self.x, self.y])
-
         if len(self.trail) > LIMIT_TRAIL:
             self.trail.pop(0)

@@ -12,6 +12,9 @@ from change_contrast import change_contrast
 from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
+
+from expand_image import expand_image
+
 colorama_init()
 
 
@@ -28,6 +31,7 @@ MENU: list[tuple[str, Callable[[], None]]] = [
 	('Прочитать bin-файла', read_file),
 	('Отобразить изображение', show_image),
 	('Изменить размер изображения', resize_image),
+	('Изменить ширину или высоту',expand_image),
 	('Изменить уровень контрастности изображения', change_contrast),
 	('Сохранить изображение', save_image),
 ]

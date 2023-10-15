@@ -5,20 +5,6 @@ from State import State
 from constants import BACKGROUND_COLOR
 
 
-def reshape(array, height, width):
-	"""
-	Функция для изменения формы массива
-	"""
-	matrix = []
-	for i in range(height):
-		row = []
-		for j in range(width):
-			pixel_index = i * width + j
-			row.append(array[pixel_index])
-		matrix.append(row)
-	return matrix
-
-
 def resize_image():
 	"""
 	Функция для увеличения изображения
@@ -35,19 +21,19 @@ def resize_image():
 		return
 
 	# Вычисление новых параметров изображения
-	pixels_colors_matrix = reshape(state.pixels_colors, state.height_image, state.width_image)
 	new_width_image = state.width_image * resize_factor
 	new_height_image = state.height_image * resize_factor
 	new_pixels_values_count = new_width_image * new_height_image
 	new_pixels_colors = [0 for _ in range(0, new_pixels_values_count)]
 
 	# Метод ближайшего соседа
-	for i in range(0, new_height_image):
-		for j in range(0, new_width_image):
-			x = math.floor(i / resize_factor)
-			y = math.floor(j / resize_factor)
-			pixel_index = i * new_width_image + j
-			new_pixels_colors[pixel_index] = pixels_colors_matrix[x][y]
+	for new_i in range(0, new_height_image):
+		for new_j in range(0, new_width_image):
+			new_pixel_index = new_i * new_width_image + new_j
+			i = math.floor(new_i / resize_factor)
+			j = math.floor(new_j / resize_factor)
+			pixel_index = i * state.width_image + j
+			new_pixels_colors[new_pixel_index] = state.pixels_colors[pixel_index]
 
 	# Присваивание новых значений
 	state.width_image = new_width_image

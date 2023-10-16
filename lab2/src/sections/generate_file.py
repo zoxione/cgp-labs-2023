@@ -5,6 +5,7 @@ from PIL import Image
 from colorama import Fore
 from colorama import Style
 import concurrent.futures
+from src.data.constants import BACKGROUND_COLOR_INDEX
 
 
 def generate_random_colors(palette_values_count):
@@ -123,7 +124,7 @@ def generate_file():
 				if color in palette_values:
 					pixels_values.append(palette_values.index(color))
 				else:
-					pixels_values.append(34)
+					pixels_values.append(BACKGROUND_COLOR_INDEX)
 
 		# Преобразование палитры в нужный формат
 		temp_palette_values = palette_values

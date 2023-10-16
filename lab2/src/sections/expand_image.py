@@ -40,7 +40,7 @@ def expand_image():
 		return
 
 	# Создание матрицы
-	pixels_colors_matrix = reshape(state.image_file.pixels_values, state.image_file.height, state.image_file.width)
+	pixels_values_matrix = reshape(state.image_file.pixels_values, state.image_file.height, state.image_file.width)
 
 	# Вычисление новых параметров изображения
 	new_width = state.image_file.width
@@ -53,7 +53,7 @@ def expand_image():
 		new_width = state.image_file.width
 
 	new_pixels_values = [
-		[pixels_colors_matrix[int(i * state.image_file.height / new_height)]
+		[pixels_values_matrix[int(i * state.image_file.height / new_height)]
 			[int(j * state.image_file.width / new_width)]
 			for j in range(new_width)] for i in range(new_height)
 	]

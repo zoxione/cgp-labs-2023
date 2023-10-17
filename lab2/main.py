@@ -2,6 +2,7 @@ import sys
 from typing import Callable
 
 from src.classes.State import State
+from src.flip_image import flip_image
 from src.sections.generate_file import generate_file
 from src.sections.show_image import show_image
 from src.sections.save_image import save_image
@@ -31,6 +32,7 @@ MENU: list[tuple[str, Callable[[], None]]] = [
 	('Изменить размер изображения', resize_image),
 	('Изменить ширину или высоту', expand_image),
 	('Изменить уровень контрастности изображения', change_contrast),
+	('Отзеркалить изображение', flip_image)
 	('Сохранить изображение', save_image),
 ]
 

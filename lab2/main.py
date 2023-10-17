@@ -2,7 +2,7 @@ import sys
 from typing import Callable
 
 from src.classes.State import State
-from src.flip_image import flip_image
+from src.sections.flip_image import flip_image
 from src.sections.generate_file import generate_file
 from src.sections.show_image import show_image
 from src.sections.save_image import save_image
@@ -10,6 +10,8 @@ from src.sections.read_file import read_file
 from src.sections.resize_image import resize_image
 from src.sections.change_contrast import change_contrast
 from src.sections.expand_image import expand_image
+from src.sections.cut import cut
+from src.sections.paint import paint
 
 from colorama import init as colorama_init
 from colorama import Fore
@@ -32,8 +34,10 @@ MENU: list[tuple[str, Callable[[], None]]] = [
 	('Изменить размер изображения', resize_image),
 	('Изменить ширину или высоту', expand_image),
 	('Изменить уровень контрастности изображения', change_contrast),
-	('Отзеркалить изображение', flip_image)
-	('Сохранить изображение', save_image),
+	('Отзеркалить изображение', flip_image),
+	('Копировать и вставить', cut),
+	('Изменить оттенок изображения', paint),
+	('Сохранить изображение', save_image)
 ]
 
 

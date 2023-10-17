@@ -2,7 +2,6 @@ from PIL import Image
 from src.classes.ImageFile import ImageFile
 from src.data.constants import BACKGROUND_COLOR
 
-
 class SingletonMetaclass(type):
 	_instances = {}
 

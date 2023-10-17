@@ -20,3 +20,4 @@ class State(metaclass=SingletonMetaclass):
         self.figures: List[Figure] = []
         self.screen: Surface | None = None
         self.movement_mode = MovementMode.Linear
+        self.game_run = True

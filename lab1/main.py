@@ -2,9 +2,10 @@ import math
 import random
 import pygame
 import sys
+import time
 from Figure import Figure
 from State import State
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, Color, BACKGROUND_COLOR, Shape, COUNT_FIGURES, TARGET_FPS, Direction, MovementMode
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, Color, BACKGROUND_COLOR, Shape, COUNT_FIGURES, TARGET_FPS, Direction, MovementMode, K
 
 
 def clear_screen(current_x, current_y, future_x, future_y, width, height, shape: Shape):
@@ -117,7 +118,7 @@ def draw_trail(trail, shape: Shape, width, height, color_fill):
 
 def handle_keys():
     """
-    Функция для обработки событий клавиш (Отховнов + Бакухин)
+    Функция для обработки событий клавиш (Отховнов + Бакухин + Гром)
     """
     keys = pygame.key.get_pressed()
     state = State()
@@ -136,46 +137,111 @@ def handle_keys():
     elif keys[pygame.K_2]:
         state.movement_mode = MovementMode.Circular
     elif keys[pygame.K_3]:
+        for f in state.figures:
+            f.dy = -3
         state.movement_mode = MovementMode.Gravity
+    elif keys[pygame.K_4]:
+        state.movement_mode = MovementMode.Linear
+        init_figures(True)
+    elif keys[pygame.K_5]:
+        for f in state.figures:
+            f.dx = 1
+            f.dy = K
 
 
 def check_collision(figure1, figure2):
     """
     Функция проверки на коллизию двух фигур (Бакухин)
     """
-    if (figure1.x + figure1.width > figure2.x and
-            figure1.x < figure2.x + figure2.width and
-            figure1.y + figure1.height > figure2.y and
-            figure1.y < figure2.y + figure2.height):
+    if (figure1.x + figure1.width / 2 > figure2.x - figure2.width / 2 and
+            figure1.x - figure1.width / 2 < figure2.x + figure2.width / 2 and
+            figure1.y + figure1.height / 2 > figure2.y - figure2.height / 2 and
+            figure1.y - figure1.height / 2 < figure2.y + figure2.height / 2):
         return True
     return False
 
 
 def handle_collision(figure1, figure2):
     """
-    Функция для обработки коллизии двух фигур (Бакухин)
+    Функция для обработки коллизии двух фигур (Бакухин + Гром)
     """
-    # Рассчитываем расстояние между центрами фигур
-    distance = math.sqrt((figure1.x - figure2.x) ** 2 + (figure1.y - figure2.y) ** 2)
+    if (state.movement_mode == MovementMode.Gravity):
+        top_figure = figure1 if figure1.y < figure2.y else figure2
+        bottom_figure = figure2 if figure1.y < figure2.y else figure1
+        top_figure.dy = 0
+        top_figure.y = bottom_figure.y - bottom_figure.height / 2 - top_figure.height / 2
+    else:
+        # Рассчитываем расстояние между центрами фигур
+        distance = math.sqrt((figure1.x - figure2.x) ** 2 + (figure1.y - figure2.y) ** 2)
 
-    # Рассчитываем перекрытие
-    overlap = (figure1.width + figure2.width) / 2 - distance
+        # Рассчитываем перекрытие
+        overlap = (figure1.width + figure2.width) / 2 - distance
 
-    # Если есть перекрытие, то отодвигаем фигуры
-    if overlap > 0:
-        angle = math.atan2(figure2.y - figure1.y, figure2.x - figure1.x)
-        dx = overlap * math.cos(angle)
-        dy = overlap * math.sin(angle)
-        figure1.x -= dx
-        figure1.y -= dy
-        figure2.x += dx
-        figure2.y += dy
+        # Если есть перекрытие, то отодвигаем фигуры
+        if overlap > 0:
+            angle = math.atan2(figure2.y - figure1.y, figure2.x - figure1.x)
+            dx = overlap * math.cos(angle)
+            dy = overlap * math.sin(angle)
+            figure1.x -= dx
+            figure1.y -= dy
+            figure2.x += dx
+            figure2.y += dy
 
-        # Меняем направление движения
-        figure1.dx = -figure1.dx
-        figure1.dy = -figure1.dy
-        figure2.dx = -figure2.dx
-        figure2.dy = -figure2.dy
+            # Меняем направление движения
+            figure1.dx = -figure1.dx
+            figure1.dy = -figure1.dy
+            figure2.dx = -figure2.dx
+            figure2.dy = -figure2.dy
+
+
+last_click = time.time()
+def draw_menu(surface, font):
+    global last_click
+    state = State()
+
+    pygame.draw.rect(surface, 'blue', pygame.Rect(200, 10, 80, 30))
+    exit_text = font.render("Выход", True, Color.WHITE.value)
+    state.screen.blit(exit_text, (210, 20))
+
+    pygame.draw.rect(surface, 'blue', pygame.Rect(300, 10, 150, 30))
+    pause_text = font.render("Пауза/Продолжить", True, Color.WHITE.value)
+    state.screen.blit(pause_text, (310, 20))
+
+    pygame.draw.rect(surface, 'blue', pygame.Rect(470, 10, 120, 30))
+    exit_text = font.render("Перезапустить", True, Color.WHITE.value)
+    state.screen.blit(exit_text, (480, 20))
+    
+    mouse_key = pygame.mouse.get_pressed()
+    mouse_pos = pygame.mouse.get_pos()
+    if (mouse_key[0] and mouse_pos[1] > 10 and mouse_pos[1] < 40):
+        if (mouse_pos[0] > 200 and mouse_pos[0] < 280):
+            exit()
+        elif (mouse_pos[0] > 300 and mouse_pos[0] < 450):
+            if (time.time() - last_click > 0.5):
+                state.game_run = not state.game_run
+                last_click = time.time()
+        elif (mouse_pos[0] > 470 and mouse_pos[0] < 590):
+            state.movement_mode = MovementMode.Linear
+            init_figures()
+
+
+def init_figures(rect_only=False):
+    state.figures.clear()
+    # Инициализация фигур
+    for _ in range(COUNT_FIGURES):
+        shape = Shape.Rectangle if rect_only else random.choice(list(Shape))
+        position = [random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT)]
+        size = [random.randint(16, 42), random.randint(16, 42)]
+        velocity = [random.randint(-5, 5), random.randint(-5, 5)]
+        color_fill = random.choice(list(Color))
+        color_outline = random.choice(list(Color))
+        state.figures.append(Figure(shape, position[0], position[1], size[0], size[1], velocity[0], velocity[1], color_fill, color_outline))
+
+    # Инициализация фигуры для пользователя
+    user_position = [random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT)]
+    user_size = [random.randint(16, 42), random.randint(16, 42)]
+    user_velocity = [random.randint(-5, 5), random.randint(-5, 5)]
+    state.user_figure = Figure(Shape.Circle, user_position[0], user_position[1], user_size[0], user_size[1], user_velocity[0], user_velocity[1], Color.RED, Color.YELLOW)
 
 
 if __name__ == "__main__":
@@ -192,21 +258,7 @@ if __name__ == "__main__":
     state = State()
     state.screen = screen
 
-    # Инициализация фигур
-    for _ in range(COUNT_FIGURES):
-        shape = random.choice(list(Shape))
-        position = [random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT)]
-        size = [random.randint(16, 42), random.randint(16, 42)]
-        velocity = [random.randint(-5, 5), random.randint(-5, 5)]
-        color_fill = random.choice(list(Color))
-        color_outline = random.choice(list(Color))
-        state.figures.append(Figure(shape, position[0], position[1], size[0], size[1], velocity[0], velocity[1], color_fill, color_outline))
-
-    # Инициализация фигуры для пользователя
-    user_position = [random.randint(0, SCREEN_WIDTH), random.randint(0, SCREEN_HEIGHT)]
-    user_size = [random.randint(16, 42), random.randint(16, 42)]
-    user_velocity = [random.randint(-5, 5), random.randint(-5, 5)]
-    state.user_figure = Figure(Shape.Circle, user_position[0], user_position[1], user_size[0], user_size[1], user_velocity[0], user_velocity[1], Color.RED, Color.YELLOW)
+    init_figures()
 
     # Основной цикл
     while True:
@@ -215,80 +267,84 @@ if __name__ == "__main__":
                 pygame.quit()
                 sys.exit()
 
-        user_current_x = state.user_figure.x
-        user_current_y = state.user_figure.y
+        if (state.game_run):
+            user_current_x = state.user_figure.x
+            user_current_y = state.user_figure.y
 
-        state.user_figure.move(MovementMode.Linear)
-        clear_screen(
-            user_current_x,
-            user_current_y,
-            state.user_figure.x,
-            state.user_figure.y,
-            state.user_figure.width,
-            state.user_figure.height,
-            state.user_figure.shape
-        )
-        state.screen.fill(BACKGROUND_COLOR)
-        draw_figure(
-            screen,
-            state.user_figure.shape,
-            state.user_figure.x,
-            state.user_figure.y,
-            state.user_figure.width,
-            state.user_figure.height,
-            state.user_figure.color_fill.value,
-            state.user_figure.color_outline.value
-        )
-
-        state.user_figure.update_trail()
-        draw_trail(
-            state.user_figure.trail,
-            state.user_figure.shape,
-            state.user_figure.width,
-            state.user_figure.height,
-            state.user_figure.color_fill.value
-        )
-        display_info(info_font, state.user_figure.x, state.user_figure.y, state.user_figure.dx, state.user_figure.dy)
-
-        # Обработка нажатий на клавиши
-        handle_keys()
-
-        # Отображение ФПС
-        display_fps(clock, fps_font, fps_surface)
-        screen.blit(fps_surface, (10, 10))
-
-        # Цикл работы с фигурами
-        for figure in state.figures:
-            # Проверка на коллизию каждой фигуры с каждой
-            for other_figure in state.figures:
-                if figure != other_figure:
-                    if check_collision(figure, other_figure):
-                        handle_collision(figure, other_figure)
-
-            figure.color_fill = random.choice(list(Color))
-            current_x = figure.x
-            current_y = figure.y
-
-            figure.move(state.movement_mode)
+            state.user_figure.move(MovementMode.Linear)
             clear_screen(
-                current_x,
-                current_y,
-                figure.x,
-                figure.y,
-                figure.width,
-                figure.height,
-                figure.shape
+                user_current_x,
+                user_current_y,
+                state.user_figure.x,
+                state.user_figure.y,
+                state.user_figure.width,
+                state.user_figure.height,
+                state.user_figure.shape
             )
+            state.screen.fill(BACKGROUND_COLOR)
             draw_figure(
                 screen,
-                figure.shape,
-                figure.x,
-                figure.y,
-                figure.width,
-                figure.height,
-                figure.color_fill.value
+                state.user_figure.shape,
+                state.user_figure.x,
+                state.user_figure.y,
+                state.user_figure.width,
+                state.user_figure.height,
+                state.user_figure.color_fill.value,
+                state.user_figure.color_outline.value
             )
-            display_info(info_font, figure.x, figure.y, figure.dx, figure.dy)
 
+            state.user_figure.update_trail()
+            draw_trail(
+                state.user_figure.trail,
+                state.user_figure.shape,
+                state.user_figure.width,
+                state.user_figure.height,
+                state.user_figure.color_fill.value
+            )
+            display_info(info_font, state.user_figure.x, state.user_figure.y, state.user_figure.dx, state.user_figure.dy)
+
+            # Обработка нажатий на клавиши
+            handle_keys()
+
+            # Отображение ФПС
+            display_fps(clock, fps_font, fps_surface)
+            screen.blit(fps_surface, (10, 10))
+
+            # Цикл работы с фигурами
+            for figure in state.figures:
+                # Проверка на коллизию каждой фигуры с каждой
+                for other_figure in state.figures:
+                    if figure != other_figure:
+                        if check_collision(figure, other_figure):
+                            handle_collision(figure, other_figure)
+
+                figure.color_fill = random.choice(list(Color))
+                current_x = figure.x
+                current_y = figure.y
+                
+                figure.move(state.movement_mode)
+
+                clear_screen(
+                    current_x,
+                    current_y,
+                    figure.x,
+                    figure.y,
+                    figure.width,
+                    figure.height,
+                    figure.shape
+                )
+                draw_figure(
+                    screen,
+                    figure.shape,
+                    figure.x,
+                    figure.y,
+                    figure.width,
+                    figure.height,
+                    figure.color_fill.value
+                )
+                display_info(info_font, figure.x, figure.y, figure.dx, figure.dy)
+
+        draw_menu(screen, info_font)
+    
         pygame.display.flip()
         clock.tick(TARGET_FPS)

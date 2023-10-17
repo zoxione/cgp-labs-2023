@@ -19,15 +19,15 @@ class Figure:
         self.trail = []
         self.angle = random.uniform(0, 2 * math.pi)
 
-    def check_screen_boundary(self):
+    def check_screen_boundary(self, isBounce = True):
         """
         Метод проверки на отражение от краев экрана (Отхонов + Бакухин)
         """
-        if self.x - self.width / 2 <= 0 or self.x + self.width / 2 >= SCREEN_WIDTH:
-            self.dx = -self.dx
+        if self.x - self.width / 2 < 0 or self.x + self.width / 2 > SCREEN_WIDTH:
+            self.dx = -self.dx if isBounce else 0
             self.x = max(self.width / 2, min(SCREEN_WIDTH - self.width / 2, self.x))
-        if self.y - self.height / 2 <= 0 or self.y + self.height / 2 >= SCREEN_HEIGHT:
-            self.dy = -self.dy
+        if self.y - self.height / 2 < 0 or self.y + self.height / 2 > SCREEN_HEIGHT:
+            self.dy = -self.dy if isBounce else 0
             self.y = max(self.height / 2, min(SCREEN_HEIGHT - self.height / 2, self.y))
 
     def move(self, movement_mode: MovementMode):
@@ -38,6 +38,8 @@ class Figure:
             self.move_linear()
         elif movement_mode.value == MovementMode.Circular.value:
             self.move_circular(RADIUS_MOVE_CIRCULAR)
+        elif movement_mode.value == MovementMode.Gravity.value:
+            self.move_gravity()
 
     def move_linear(self):
         """
@@ -55,6 +57,14 @@ class Figure:
         self.y = SCREEN_HEIGHT / 2 + radius * math.sin(self.angle)
         self.angle += 0.02
         self.angle %= 2 * math.pi # угол остается в диапазоне [0, 2*pi)
+
+    def move_gravity(self):
+        """
+        Метод для гравитации (Гром)
+        """
+        self.y += self.dy
+        self.dy += 0.5
+        self.check_screen_boundary(False)
 
     def change_direction(self, direction: Direction):
         """

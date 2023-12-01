@@ -55,6 +55,7 @@ def clear_all(win):
 	win.leftImage.fill(QColor(255, 255, 255))
 	win.rightImage.fill(QColor(255, 255, 255))
 	win.update_scenes()
+	win.change_current_draw("line")
 
 
 def upscale(win):

@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1042</width>
+    <height>836</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Helvetica</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Задачи определения видимости и отсечения фигур на плоскости</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="leftMargin">
+     <number>24</number>
+    </property>
+    <property name="topMargin">
+     <number>24</number>
+    </property>
+    <property name="rightMargin">
+     <number>24</number>
+    </property>
+    <property name="bottomMargin">
+     <number>24</number>
+    </property>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="100,60">
+      <property name="spacing">
+       <number>16</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QGraphicsView" name="mainGraphicsView"/>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <property name="spacing">
+         <number>8</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMinimumSize</enum>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="spacing">
+             <number>16</number>
+            </property>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_8">
+              <property name="spacing">
+               <number>4</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>Настройки</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="modeAlphaRadioButton">
+                <property name="text">
+                 <string>Режим «А»</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">modeButtonGroup</string>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="modeBetaRadioButton">
+                <property name="text">
+                 <string>Режим «Б»</string>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">modeButtonGroup</string>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="gridCheckBox">
+                <property name="text">
+                 <string>Сетка</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="overlapCheckBox">
+                <property name="text">
+                 <string>Отсечения</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_6">
+              <property name="spacing">
+               <number>4</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Окно</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <property name="spacing">
+                 <number>4</number>
+                </property>
+                <item>
+                 <widget class="QSlider" name="frameSizeSlider">
+                  <property name="minimum">
+                   <number>30</number>
+                  </property>
+                  <property name="maximum">
+                   <number>300</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>10</number>
+                  </property>
+                  <property name="value">
+                   <number>140</number>
+                  </property>
+                  <property name="tracking">
+                   <bool>true</bool>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="tickPosition">
+                   <enum>QSlider::TicksBelow</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="frameSizeLabel">
+                  <property name="text">
+                   <string>200</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0">
+            <property name="spacing">
+             <number>4</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <property name="spacing">
+               <number>4</number>
+              </property>
+              <item>
+               <widget class="QDoubleSpinBox" name="resizeDoubleSpinBox">
+                <property name="maximum">
+                 <double>10.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="upscalePushButton">
+                <property name="text">
+                 <string>Изменить</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="clearPushButton">
+              <property name="text">
+               <string>Очистить</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="texturePushButton">
+              <property name="text">
+               <string>Добавить текстуру</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_8"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,100">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="backPushButton">
+              <property name="text">
+               <string>Назад</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="currentLayerLabel">
+              <property name="text">
+               <string>Текущий слой: 0/10</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="forwardPushButton">
+              <property name="text">
+               <string>Вперед</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="drawOnePushButton">
+              <property name="text">
+               <string>Нарисовать слой</string>
+              </property>
+              <property name="autoDefault">
+               <bool>false</bool>
+              </property>
+              <property name="default">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item alignment="Qt::AlignVCenter">
+             <widget class="QPushButton" name="drawAllPushButton">
+              <property name="text">
+               <string>Нарисовать все слои</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="countPixelsInCellLabel">
+        <property name="text">
+         <string>Количество пикселей в ячейке: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="timeSpentOverlapsLabel">
+        <property name="text">
+         <string>Затраченное время на растеризацию слоёв с отсечениями:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="timeSpentLabel">
+        <property name="text">
+         <string>Затраченное время на растеризацию слоёв без отсечений:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="modeButtonGroup"/>
+ </buttongroups>
+</ui>

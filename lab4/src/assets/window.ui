@@ -96,9 +96,19 @@
                </widget>
               </item>
               <item>
-               <widget class="QRadioButton" name="modeBetaRadioButton">
+               <widget class="QRadioButton" name="modeBravoRadioButton">
                 <property name="text">
                  <string>Режим «Б»</string>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">modeButtonGroup</string>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="modeCharlieRadioButton">
+                <property name="text">
+                 <string>Режим «С»</string>
                 </property>
                 <attribute name="buttonGroup">
                  <string notr="true">modeButtonGroup</string>

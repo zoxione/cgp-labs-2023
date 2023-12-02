@@ -1,18 +1,16 @@
 import math
-from typing import List, Tuple
 from PyQt5 import QtWidgets, uic, QtGui
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QImage, QColor, QPixmap
-
 from src.algorithms.area_modified_stack_internal import area_modified_stack_internal
 from src.algorithms.framing_sutherland_cohen import framing_sutherland_cohen
 from src.algorithms.line_bresenham import line_bresenham
 from src.classes.Container import Container
 from src.classes.Polygon import Polygon
 from src.classes.UniqueQueue import UniqueQueuePoints
-from src.data.constants import LAYERS, Mode, FRAME_SIZES, IMAGES_SIZES, CELL_SIZE, BACKGROUND_COLOR
-from src.handlers import draw_one, draw_all, change_layer, clear_all, upscale, toggle_show_grid, toggle_mode, \
-	change_frame_sizes, add_texture
+from src.data.constants import LAYERS, Mode, FRAME_SIZES, IMAGES_SIZES, CELL_SIZE, BACKGROUND_COLOR, TRANSPARENT_COLOR
+from src.handlers import change_layer, clear_all, upscale, toggle_show_grid, toggle_mode, \
+	change_frame_sizes, add_texture, start_draw
 
 
 class Window(QtWidgets.QMainWindow):
@@ -27,6 +25,7 @@ class Window(QtWidgets.QMainWindow):
 		self.container = Container(LAYERS, FRAME_SIZES)
 		self.main_pixels_queue = UniqueQueuePoints([])
 		self.texture = None
+		self.draw_thread = None
 
 		# Настройка таймера
 		self.draw_timer = QTimer()
@@ -36,8 +35,8 @@ class Window(QtWidgets.QMainWindow):
 		# Инициализация текста
 		self.currentLayerLabel.setText(f'Текущий слой: {self.container.current_layer_index}/{self.container.count_layers-1}')
 		self.countPixelsInCellLabel.setText(f'Количество пикселей в ячейке: {self.cell_size ** 2}')
-		self.timeSpentOverlapsLabel.setText(f'Затраченное время на растеризацию слоёв с отсечениями: ')
-		self.timeSpentLabel.setText(f'Затраченное время на растеризацию слоёв без отсечений: ')
+		self.timeSpentOverlapsLabel.setText(f'Затраченное время на растеризацию слоёв с отсечениями: 0')
+		self.timeSpentLabel.setText(f'Затраченное время на растеризацию слоёв без отсечений: 0')
 		self.frameSizeLabel.setText(f'{self.container.frame_sizes[0]}')
 
 		# Настройка виджетов
@@ -51,15 +50,14 @@ class Window(QtWidgets.QMainWindow):
 		self.mainImage = QImage(IMAGES_SIZES[0], IMAGES_SIZES[1], QImage.Format_ARGB32)
 		self.mainImage.fill(QColor(*BACKGROUND_COLOR))
 
-		# Рисуем сетку
+		# Сетка
 		self.gridImage = QImage(IMAGES_SIZES[0], IMAGES_SIZES[1], QImage.Format_ARGB32)
 		# self.draw_grid(QColor(*GRID_COLOR))
-
 		self.update_scenes()
 
 		# Обработчики нажатий
-		self.drawOnePushButton.clicked.connect(lambda: draw_one(self))
-		self.drawAllPushButton.clicked.connect(lambda: draw_all(self))
+		self.drawOnePushButton.clicked.connect(lambda: start_draw(self, "one"))
+		self.drawAllPushButton.clicked.connect(lambda: start_draw(self, "all"))
 		self.backPushButton.clicked.connect(lambda: change_layer(self, "back"))
 		self.forwardPushButton.clicked.connect(lambda: change_layer(self, "forward"))
 		self.clearPushButton.clicked.connect(lambda: clear_all(self))
@@ -89,8 +87,10 @@ class Window(QtWidgets.QMainWindow):
 		self.clearPushButton.setEnabled(state)
 		self.upscalePushButton.setEnabled(state)
 		self.gridCheckBox.setEnabled(state)
+		self.overlapCheckBox.setEnabled(state)
 		for button in self.modeButtonGroup.buttons():
 			button.setEnabled(state)
+		self.resizeDoubleSpinBox.setEnabled(state)
 		self.frameSizeSlider.setEnabled(state)
 		self.texturePushButton.setEnabled(state)
 
@@ -98,6 +98,9 @@ class Window(QtWidgets.QMainWindow):
 		"""
 		Метод для рисования пикселя
 		"""
+		if QColor(*TRANSPARENT_COLOR) == color:
+			return
+
 		# Корректировка координат, чтобы пиксель соответствовал ячейке сетки
 		image_x = image.width() // 2 + (x * self.cell_size)
 		image_y = image.height() // 2 + (- y * self.cell_size)

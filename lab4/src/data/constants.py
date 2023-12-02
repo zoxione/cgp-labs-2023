@@ -6,6 +6,7 @@ from src.classes.Polygon import Polygon
 IMAGES_SIZES = (800, 800)
 FRAME_SIZES = (250, 250)
 BACKGROUND_COLOR = (225, 225, 225)
+TRANSPARENT_COLOR = (155, 0, 255)
 FRAME_COLOR = (255, 128, 128)
 OVERLAP_COLOR = (255, 0, 0)
 GRID_COLOR = (220, 220, 220)
@@ -40,7 +41,8 @@ class Color(Enum):
 @unique
 class Mode(Enum):
 	ALPHA = 1
-	BETA = 2
+	BRAVO = 2
+	CHARLIE = 3
 
 
 LAYERS = [

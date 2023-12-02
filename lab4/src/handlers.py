@@ -1,66 +1,29 @@
-import time
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QColor, QPixmap
 from PyQt5.QtWidgets import QFileDialog
-from src.algorithms.framing_sutherland_cohen import framing_sutherland_cohen
-from src.algorithms.general import alternative_color
-from src.algorithms.overlap_sutherland_hodgman import overlap_sutherland_hodgman
-from src.classes.Polygon import Polygon
-from src.data.constants import Mode, GRID_COLOR, BACKGROUND_COLOR, Color
+from src.classes.DrawThread import DrawThread
+from src.data.constants import Mode, GRID_COLOR, BACKGROUND_COLOR
 
 
-def draw_one(win):
-	"""
-	Обработчик нажатия на кнопку для рисования текущего полигона
-	"""
-	start_time = time.perf_counter()
+@pyqtSlot()
+def start_draw(win, mode: str):
+	win.change_buttons_state(False)
+
+	win.draw_thread = DrawThread(win, mode)
+	win.draw_thread.resultAvailable.connect(lambda result: draw_ready(win, result))
+	win.draw_thread.start()
+
+
+@pyqtSlot(float)
+def draw_ready(win, result):
+	win.change_buttons_state(True)
+	win.draw_thread = None
 	win.draw_timer.start()
 
-	for i in range(0, len(win.container.current_layer.polygons)):
-		current_polygon: Polygon = win.container.current_layer.polygons[i].copy()
-
-		if win.container.current_layer_index == 0:
-			win.draw_lines(win.container.crop_layer.polygons[0], 0)
-		else:
-			# Поиск перекрытий по прошлым многоугольникам текущего слоя
-			prev_polygons = win.container.current_layer.polygons[0:i]
-			for polygon in prev_polygons:
-				win.container.find_overlap_polygons(current_polygon, polygon, win.container.current_layer_index)
-
-			# Поиск перекрытий по каждому многоугольнику предыдущих слоев
-			prev_layers = win.container.layers[1:win.container.current_layer_index]
-			prev_layers.reverse()
-			for j in range(0, len(prev_layers)):
-				for polygon in prev_layers[j].polygons:
-					win.container.find_overlap_polygons(current_polygon, polygon, j)
-
-			# Отрисовка исходного многоугольника
-			win.draw_lines(current_polygon, win.container.current_layer_index)
-			win.draw_areas(current_polygon, win.container.current_layer_index)
-
-			if win.overlapCheckBox.isChecked():
-				# Закраска всех перекрытий
-				for index in range(win.container.current_layer_index - 1, 0, -1):
-					for line in win.container.current_layer.overlap_lines:
-						if index == line[1]:
-							if win.current_mode == Mode.BETA:
-								line[0].contour_color = alternative_color(line[0].contour_color)
-							win.draw_lines(line[0], line[1])
-					for area in win.container.current_layer.overlap_areas:
-						if index == area[1]:
-							if win.current_mode == Mode.BETA:
-								area[0].fill_color = alternative_color(area[0].fill_color)
-							win.draw_areas(area[0], area[1])
-
-	end_time = time.perf_counter()
-	execution_time = (end_time - start_time) * 1000
 	if win.overlapCheckBox.isChecked():
-		win.timeSpentOverlapsLabel.setText(f'Затраченное время на растеризацию слоёв с отсечениями: {execution_time:.4f}')
+		win.timeSpentOverlapsLabel.setText(f'Затраченное время на растеризацию слоёв с отсечениями: {result:.4f}')
 	else:
-		win.timeSpentLabel.setText(f'Затраченное время на растеризацию слоёв без отсечений: {execution_time:.4f}')
-
-
-def draw_all(win):
-	pass
+		win.timeSpentLabel.setText(f'Затраченное время на растеризацию слоёв без отсечений: {result:.4f}')
 
 
 def change_layer(win, mode: str):
@@ -106,8 +69,10 @@ def toggle_show_grid(win):
 def toggle_mode(win, clicked_button):
 	if win.modeAlphaRadioButton == clicked_button:
 		win.current_mode = Mode.ALPHA
-	elif win.modeBetaRadioButton == clicked_button:
-		win.current_mode = Mode.BETA
+	elif win.modeBravoRadioButton == clicked_button:
+		win.current_mode = Mode.BRAVO
+	elif win.modeCharlieRadioButton == clicked_button:
+		win.current_mode = Mode.CHARLIE
 
 
 def change_frame_sizes(win, value):

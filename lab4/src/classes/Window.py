@@ -174,8 +174,8 @@ class Window(QtWidgets.QMainWindow):
 			if p2 is not None:
 				framing_polygon.points.append(p2)
 
-		framing_polygon.normalize()
 		if len(framing_polygon.points) > 2:
+			framing_polygon.normalize()
 			center = framing_polygon.get_center()
 			center_color = self.get_pixel_color(center[0], center[1], layer_index)
 			area_modified_stack_internal(self, self.main_pixels_queue, center,  QColor(*polygon.fill_color), center_color, framing_polygon.points, layer_index)

@@ -25,7 +25,7 @@ def area_modified_stack_internal(win, pixel_queue: UniqueQueue, p: Tuple[int, in
 			if is_inside_polygon((xt, yt), points):
 				pixel_color = win.get_pixel_color(xt, yt, layer_index)
 				if win.texture:
-					new_color = win.get_color_texture(p[0], p[1])
+					new_color = win.get_color_texture(xt, yt)
 				if pixel_color == old_color:
 					pixel_queue.append((xt, yt, new_color, layer_index))
 					stack.append((xt, yt))
